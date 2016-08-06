@@ -12,10 +12,13 @@ class FeedViewController: UIViewController, XMLParserDelegate, FeedTableViewCoor
     
     // MARK: - Properties
     
+    static let ShowDetailsSegueId = "showDetails"
+    
     @IBOutlet var tableViewCoordinator: FeedTableViewCoordinator!
     
     private let coreDataManager = CoreDataManager.sharedInstance
     private let parser = XMLParser()
+    private var selectedItem: FeedItem?
 
     // MARK: - Lifecycle
     
@@ -24,26 +27,57 @@ class FeedViewController: UIViewController, XMLParserDelegate, FeedTableViewCoor
 
         tableViewCoordinator.delegate = self
         parser.delegate = self
-        dispayFeed()
+        loadFeed()
     }
     
     // MARK: - Private methods
     
-    private func dispayFeed() {
-        // TODO: check Internet connection
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-        parser.beginParsing()
+    /**
+     Request feed from Apple RSS or get cached data depending on network status
+     */
+    private func loadFeed() {
+        if NetworkReachability.isConnected() {
+            UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+            parser.beginParsing()
+        } else {
+            // Explicit call from main quue is required because when application
+            // has just launched, view controller's UI could be not fully loaded
+            // and call of .presentViewController() will cause a warning
+            dispatch_async(dispatch_get_main_queue(), {
+                let alertController = AlertsUtility.alertControllerOfType(AlertType.Warning,
+                    message: Constants.Messages.ShowingCachedFeedMsg)
+                self.presentViewController(alertController, animated: true, completion: nil)
+            })
+            showCurrentFeed()
+        }
+    }
+    
+    /**
+     Fetch items from the database and reload table
+     */
+    private func showCurrentFeed() {
+        let feedItems = coreDataManager.getCurrentFeedItems()
+        if feedItems.count == 0 {
+            // Same reason here
+            dispatch_async(dispatch_get_main_queue(), {
+            let alertController = AlertsUtility.alertControllerOfType(AlertType.Other,
+                                                                      message: Constants.Messages.EmptyFeedMsg)
+            self.presentViewController(alertController, animated: true, completion: nil)
+            })
+        }
+        tableViewCoordinator.reloadData(feedItems)
 
     }
     
     // MARK: - FeedTableViewCoordinatorDelegate
     
     func feedTableViewCoordinatorDidSelectItem(item: FeedItem) {
-        print("selected: \(item)")
+        selectedItem = item
+        performSegueWithIdentifier(FeedViewController.ShowDetailsSegueId, sender: self)
     }
 
     func feedTableViewCoordinatorDidRefresh() {
-        dispayFeed()
+        loadFeed()
     }
     
     // MARK: - XMLParserDelegate
@@ -52,13 +86,7 @@ class FeedViewController: UIViewController, XMLParserDelegate, FeedTableViewCoor
         UIApplication.sharedApplication().networkActivityIndicatorVisible = false
 
         coreDataManager.storeFeedItemsFromData(result)
-        let feedItems = coreDataManager.getCurrentFeedItems()
-        if feedItems.count == 0 {
-            let alertController = AlertsUtility.alertControllerOfType(AlertType.Other,
-                                                                      message: Constants.Messages.EmptyFeedMsg)
-            self.presentViewController(alertController, animated: true, completion: nil)
-        }
-        tableViewCoordinator.reloadData(feedItems)
+        showCurrentFeed()
     }
     
     func parsingDidFail(error: NSError) {
@@ -68,14 +96,14 @@ class FeedViewController: UIViewController, XMLParserDelegate, FeedTableViewCoor
         self.presentViewController(alertController, animated: true, completion: nil)
     }
     
-    /*
      // MARK: - Navigation
      
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
      override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-     // Get the new view controller using segue.destinationViewController.
-     // Pass the selected object to the new view controller.
+        guard let detailsVC = segue.destinationViewController as? FeedDetailsViewController else {
+            print("segue error")
+            return
+        }
+        detailsVC.itemToPresent = selectedItem
      }
-     */
     
 }

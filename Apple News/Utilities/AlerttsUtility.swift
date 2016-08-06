@@ -11,6 +11,7 @@ import UIKit
 enum AlertType: String {
     case Other = ""
     case Error = "Error"
+    case Warning = "Warning"
 }
 
 /// Factory that generates customized UIAlertController objects for a set of specific cases

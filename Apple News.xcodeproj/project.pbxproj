@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		7887468C1D5641EA00F82C9D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7887468B1D5641EA00F82C9D /* Constants.swift */; };
+		7887468E1D56563F00F82C9D /* NetworkReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7887468D1D56563F00F82C9D /* NetworkReachability.swift */; };
+		788746901D565AF200F82C9D /* FeedDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7887468F1D565AF200F82C9D /* FeedDetailsViewController.swift */; };
 		788EE6181D5465E400283343 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 788EE6171D5465E400283343 /* AppDelegate.swift */; };
 		788EE61D1D5465E400283343 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 788EE61B1D5465E400283343 /* Main.storyboard */; };
 		788EE6201D5465E400283343 /* Apple_News.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 788EE61E1D5465E400283343 /* Apple_News.xcdatamodeld */; };
@@ -28,6 +30,8 @@
 
 /* Begin PBXFileReference section */
 		7887468B1D5641EA00F82C9D /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		7887468D1D56563F00F82C9D /* NetworkReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkReachability.swift; sourceTree = "<group>"; };
+		7887468F1D565AF200F82C9D /* FeedDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedDetailsViewController.swift; sourceTree = "<group>"; };
 		788EE6141D5465E400283343 /* Apple News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Apple News.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		788EE6171D5465E400283343 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		788EE61C1D5465E400283343 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -96,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				788EE6311D54692B00283343 /* FeedViewController.swift */,
+				7887468F1D565AF200F82C9D /* FeedDetailsViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -107,6 +112,7 @@
 				78C3E20B1D5624FC009CED2C /* DateFormattingUtility.swift */,
 				788EE6451D54D59700283343 /* CoreDataManager.swift */,
 				7887468B1D5641EA00F82C9D /* Constants.swift */,
+				7887468D1D56563F00F82C9D /* NetworkReachability.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -215,12 +221,14 @@
 				788EE63E1D549FE700283343 /* XMLParser.swift in Sources */,
 				788EE6201D5465E400283343 /* Apple_News.xcdatamodeld in Sources */,
 				788EE6441D54CE5E00283343 /* AlerttsUtility.swift in Sources */,
+				788746901D565AF200F82C9D /* FeedDetailsViewController.swift in Sources */,
 				788EE63A1D54813600283343 /* FeedTableHeaderView.swift in Sources */,
 				788EE6341D546CD100283343 /* FeedTableViewCell.swift in Sources */,
 				788EE6321D54692B00283343 /* FeedViewController.swift in Sources */,
 				788EE6421D54A6C300283343 /* FeedItem.swift in Sources */,
 				7887468C1D5641EA00F82C9D /* Constants.swift in Sources */,
 				78C3E20C1D5624FC009CED2C /* DateFormattingUtility.swift in Sources */,
+				7887468E1D56563F00F82C9D /* NetworkReachability.swift in Sources */,
 				788EE63C1D5498E500283343 /* FeedTableViewCoordinator.swift in Sources */,
 				788EE6411D54A6C300283343 /* FeedItem+CoreDataProperties.swift in Sources */,
 				788EE6181D5465E400283343 /* AppDelegate.swift in Sources */,

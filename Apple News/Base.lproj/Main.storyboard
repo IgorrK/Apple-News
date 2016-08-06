@@ -97,9 +97,12 @@
                             </mask>
                         </variation>
                     </view>
-                    <navigationItem key="navigationItem" title="Apple News" id="ymO-so-HiE"/>
+                    <navigationItem key="navigationItem" title="Apple News" id="ymO-so-HiE">
+                        <barButtonItem key="backBarButtonItem" title="Back" id="plI-1I-jNX"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="tableViewCoordinator" destination="my7-Cr-2xl" id="tVJ-La-9g2"/>
+                        <segue destination="WgO-GN-VKB" kind="show" identifier="showDetails" id="tzo-VV-C0y"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -110,6 +113,64 @@
                 </customObject>
             </objects>
             <point key="canvasLocation" x="739.5" y="836.5"/>
+        </scene>
+        <!--Apple News-->
+        <scene sceneID="X9k-r4-nbE">
+            <objects>
+                <viewController id="WgO-GN-VKB" customClass="FeedDetailsViewController" customModule="Apple_News" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="9R3-I7-y8w"/>
+                        <viewControllerLayoutGuide type="bottom" id="d12-da-gB4"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8fs-Tb-nkK">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RKO-V4-2IO">
+                                <rect key="frame" x="20" y="87" width="335" height="0.0"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" priority="250" constant="60" id="I1D-p5-hVH"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XoN-KR-EcO">
+                                <rect key="frame" x="20" y="95" width="335" height="0.0"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="uBn-Wo-oaT">
+                                <rect key="frame" x="20" y="103" width="335" height="556"/>
+                                <fontDescription key="fontDescription" type="italicSystem" pointSize="16"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="XoN-KR-EcO" secondAttribute="trailing" constant="20" id="1vq-K1-WBs"/>
+                            <constraint firstAttribute="trailing" secondItem="uBn-Wo-oaT" secondAttribute="trailing" constant="20" id="85b-yd-7iO"/>
+                            <constraint firstItem="uBn-Wo-oaT" firstAttribute="top" secondItem="XoN-KR-EcO" secondAttribute="bottom" constant="8" id="Acq-bJ-sP7"/>
+                            <constraint firstItem="RKO-V4-2IO" firstAttribute="leading" secondItem="8fs-Tb-nkK" secondAttribute="leading" constant="20" id="BDi-nw-gWm"/>
+                            <constraint firstAttribute="trailing" secondItem="RKO-V4-2IO" secondAttribute="trailing" constant="20" id="GLA-N6-jAg"/>
+                            <constraint firstItem="XoN-KR-EcO" firstAttribute="top" secondItem="RKO-V4-2IO" secondAttribute="bottom" constant="8" id="UaE-hJ-36F"/>
+                            <constraint firstItem="XoN-KR-EcO" firstAttribute="leading" secondItem="8fs-Tb-nkK" secondAttribute="leading" constant="20" id="XZq-O9-FeM"/>
+                            <constraint firstItem="d12-da-gB4" firstAttribute="top" secondItem="uBn-Wo-oaT" secondAttribute="bottom" constant="8" id="b4p-vE-Age"/>
+                            <constraint firstItem="RKO-V4-2IO" firstAttribute="top" secondItem="9R3-I7-y8w" secondAttribute="bottom" constant="23" id="iW8-8s-6uY"/>
+                            <constraint firstItem="uBn-Wo-oaT" firstAttribute="leading" secondItem="8fs-Tb-nkK" secondAttribute="leading" constant="20" id="p6f-F8-M7V"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Apple News" id="PNA-2d-PVf"/>
+                    <connections>
+                        <outlet property="bodyTextView" destination="uBn-Wo-oaT" id="Asw-9u-grZ"/>
+                        <outlet property="dateLabel" destination="XoN-KR-EcO" id="o2S-IJ-vDG"/>
+                        <outlet property="titleLabel" destination="RKO-V4-2IO" id="Zv1-n2-PAS"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="kz2-vk-T31" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1316.5" y="862.5"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="eYR-bh-1DM">
