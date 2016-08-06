@@ -9,73 +9,109 @@
 import UIKit
 typealias tableData = (dataSource: [FeedItem], headerData: String)
 
+protocol FeedTableViewCoordinatorDelegate {
+    func feedTableViewCoordinatorDidSelectItem(item: FeedItem)
+    func feedTableViewCoordinatorDidRefresh()
+}
+
 /// Separate class responsible for interaction with UITableView on Feed screen
 final class FeedTableViewCoordinator: NSObject {
+    
     // MARK: - Properties
+    
+    var delegate: FeedTableViewCoordinatorDelegate?
     
     let tableViewDataSource = TableViewDataSource()
     let tableViewDelegate = TableViewDelegate()
+    
+    let refreshControl = UIRefreshControl()
+    
     @IBOutlet private weak var tableView: UITableView! {
         didSet {
             configureTableView()
         }
     }
     
-    // MARK : - Private methods
+    // MARK: - Lifecycle
+    
+    override init() {
+        super.init()
+        tableViewDelegate.coordinator = self
+    }
+    
+    // MARK: - Private methods
     
     func configureTableView() {
         // Register custom section header
         let headerNib = UINib(nibName: String(FeedTableHeaderView), bundle: nil)
-        self.tableView.registerNib(headerNib, forHeaderFooterViewReuseIdentifier: "id1")
+        tableView.registerNib(headerNib, forHeaderFooterViewReuseIdentifier: String(FeedTableHeaderView))
         
         // Set TableView's dataSource and delegate
-        self.tableView.dataSource = tableViewDataSource
-        self.tableView.delegate = tableViewDelegate
+        tableView.dataSource = tableViewDataSource
+        tableView.delegate = tableViewDelegate
+        
+        // Setup refresh control
+        refreshControl.addTarget(self, action: #selector(self.refresh), forControlEvents: UIControlEvents.ValueChanged)
+        tableView.addSubview(refreshControl)
     }
     
     // MARK: - Public methods
     
-    func reloadData(data: [AnyObject]) {
-        let dataSource = FeedTableViewCoordinator.generateDataSourceFromData(data as! [FeedItem])
+    func reloadData(data: [FeedItem]) {
+        let dataSource = FeedTableViewCoordinator.generateDataSourceFromData(data)
         tableViewDataSource.data = dataSource!
-//        tableViewDataSource.headersData = FeedTableViewCoordinator.generateHeadersDataWith(data)
         tableViewDelegate.data = dataSource!
+        if refreshControl.refreshing == true {
+            refreshControl.endRefreshing()
+        }
         tableView.reloadData()
     }
     
     private static func generateDataSourceFromData(data: [FeedItem]) -> [tableData]? {
-        // TODO: handle date formatting somewhere else
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "EEE, dd MMM"
-        dateFormatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-        
-        var currentDay: String?
+        let dateFormattingUtility = DateFormattingUtility.sharedInstance
+        dateFormattingUtility.configureForUsage(UsageCase.TableHeader)
+        var currentDate: NSDate?
         var index = 0
         var fullDataSource = [tableData]()
-
+        
         for item in data {
-            let pubDateStr = dateFormatter.stringFromDate(item.pubDate!)
-            if currentDay == nil {
-                currentDay = pubDateStr
+            
+            let pubDateStr = dateFormattingUtility.stringFromDate(item.pubDate!)
+            if currentDate == nil {
+                currentDate = item.pubDate
             }
             
-            if currentDay == pubDateStr {
+            let dateIsEqualToCurrent = NSCalendar.currentCalendar().isDate(item.pubDate!,
+                                                                           equalToDate: currentDate!,
+                                                                           toUnitGranularity: .Day)
+            if dateIsEqualToCurrent {
                 if fullDataSource.count == 0 {
                     fullDataSource.append(tableData([item], pubDateStr))
-                    
                 } else {
                     let tableDataItem = fullDataSource[index].dataSource
                     fullDataSource[index] = tableData(tableDataItem + [item], pubDateStr)
                 }
             } else {
                 fullDataSource.append(tableData([item], pubDateStr))
-                currentDay = pubDateStr
+                currentDate = item.pubDate
                 index += 1
             }
         }
         
         
         return fullDataSource
+    }
+    
+    // MARK: - UIRefreshControl
+    
+    func refresh() {
+        delegate?.feedTableViewCoordinatorDidRefresh()
+    }
+}
+
+private extension FeedTableViewCoordinator {
+    func handleItemSelected(item: FeedItem) {
+        delegate?.feedTableViewCoordinatorDidSelectItem(item)
     }
 }
 
@@ -84,31 +120,32 @@ class TableViewDelegate: NSObject, UITableViewDelegate {
     // MARK: - Properties
     
     var data = [tableData]()
-    private (set) var selectedItem: AnyObject?
+    var coordinator: FeedTableViewCoordinator?
     
     // MARK: - UITableViewDelegate
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-//        tableView.deselectRowAtIndexPath(indexPath, animated: true)
-//        selectedItem = data[indexPath.section][indexPath.row]
+                tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        coordinator?.handleItemSelected(data[indexPath.section].dataSource[indexPath.row])
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 88.0
+        return FeedTableViewCell.requiredHeight
     }
     
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40.0
+        return FeedTableHeaderView.requiredHeight
     }
     
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return CGFloat.min
     }
     
-//    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        let headerView = tableView.dequeueReusableHeaderFooterViewWithIdentifier("id1")
-//        return headerView
-//    }
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = tableView.dequeueReusableHeaderFooterViewWithIdentifier(String(FeedTableHeaderView)) as? FeedTableHeaderView
+        headerView?.configureWith(data[section].headerData)
+        return headerView
+    }
 }
 
 class TableViewDataSource: NSObject, UITableViewDataSource {

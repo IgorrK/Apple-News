@@ -30,7 +30,7 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
     
     var delegate: XMLParserDelegate?
     
-    private let parser: NSXMLParser
+    private var parser: NSXMLParser?
     private var parsedData = [FeedItemData]()
     private var currentData: FeedItemData?
     private var currentElement = String()
@@ -39,15 +39,22 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
     // MARK: - Lifecycle
     
     override init() {
-        parser = NSXMLParser(contentsOfURL: NSURL(string: URLString)!)!
         super.init()
-        parser.delegate = self
     }
     
     // MARK: - Public methods
     
     func beginParsing() {
-        parser.parse()
+        // Clear properties
+        parsedData = [FeedItemData]()
+        currentData = nil
+        currentElement = String()
+        foundCharacters = String()
+        
+        // Init NSXMLParser and begin parsing
+        parser = NSXMLParser(contentsOfURL: NSURL(string: URLString)!)!
+        parser!.delegate = self
+        parser!.parse()
     }
     
     // MARK: - NSXMLParserDelegate

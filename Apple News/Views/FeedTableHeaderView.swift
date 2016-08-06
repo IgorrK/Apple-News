@@ -14,6 +14,8 @@ class FeedTableHeaderView: UITableViewHeaderFooterView {
     
     @IBOutlet weak var titleLabel: UILabel!
 
+    static let requiredHeight: CGFloat = 40.0
+
     // MARK: - Lifecycle
     
     override func drawRect(rect: CGRect) {

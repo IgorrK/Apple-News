@@ -21,7 +21,7 @@ class FeedItem: NSManagedObject {
     // - Properties
     
     private static let EntityName = "FeedItem"
-    private static let DateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+    
     // - Class methods
     
     /**
@@ -59,12 +59,9 @@ class FeedItem: NSManagedObject {
         let feedItem = NSEntityDescription.insertNewObjectForEntityForName(EntityName, inManagedObjectContext: inContext) as! FeedItem
         feedItem.title = dictionary[XMLParser.keys.titleKey]
         feedItem.body = dictionary[XMLParser.keys.descriptionKey]
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = DateFormat
-        dateFormatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+        DateFormattingUtility.sharedInstance.configureForUsage(UsageCase.PubDate)
         let dateStr = dictionary[XMLParser.keys.pubDateKey]!
-        feedItem.pubDate = dateFormatter.dateFromString(dateStr)!
+        feedItem.pubDate = DateFormattingUtility.sharedInstance.dateFromString(dateStr)
         return feedItem
     }
-    
 }

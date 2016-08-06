@@ -8,13 +8,16 @@
 
 import UIKit
 
-class FeedTableViewCell: UITableViewCell {
+final class FeedTableViewCell: UITableViewCell {
     
     // MARK: - Properties
     
     @IBOutlet private weak var headerLabel: UILabel!
     @IBOutlet private weak var bodyLabel: UILabel!
     @IBOutlet private weak var dateLabel: UILabel!
+    
+    static let requiredHeight: CGFloat = 100.0
+
     var data: AnyObject?
     
     // MARK: - Lifecycle
@@ -31,7 +34,7 @@ class FeedTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
+    
     // MARK: - Public methods
     
     /**
@@ -43,6 +46,7 @@ class FeedTableViewCell: UITableViewCell {
         self.data = data
         headerLabel.text = data.title
         bodyLabel.text = data.body
-        dateLabel.text = "dte"
+        DateFormattingUtility.sharedInstance.configureForUsage(.PubDate)
+        dateLabel.text = DateFormattingUtility.sharedInstance.stringFromDate(data.pubDate!)
     }
 }

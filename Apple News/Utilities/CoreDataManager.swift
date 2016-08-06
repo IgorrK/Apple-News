@@ -11,7 +11,9 @@ import CoreData
 
 /// Separate class responsible for interaction with CoreData
 final class CoreDataManager: NSObject {
+    
     // MARK: - Properties
+    
     static let sharedInstance = CoreDataManager()
     
     private let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
@@ -27,7 +29,7 @@ final class CoreDataManager: NSObject {
     func storeFeedItemsFromData(data: [FeedItemData])  {
         // Delete the old feed
         deleteOldFeedItems()
-        
+
         // Transform data to FeedItem objects
         data.forEach { feedItemData in
             FeedItem.initNewObject(feedItemData, inContext: managedObjectContext)
@@ -38,13 +40,16 @@ final class CoreDataManager: NSObject {
     }
     
     /**
-     Fetch current FeedItems from the database
+     Fetch current FeedItems from the database,
+     sorted descending by date
      
      - returns: Array of FeedItems
      */
     func getCurrentFeedItems() -> [FeedItem] {
+        // Form a fetch request for items, sorted by date
         let fetchRequest = NSFetchRequest(entityName: FeedItem.entityName())
         let sortDescriptor = NSSortDescriptor(key: "pubDate", ascending: false)
+        
         fetchRequest.sortDescriptors = [sortDescriptor]
         do {
             let results = try managedObjectContext.executeFetchRequest(fetchRequest)

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FeedViewController: UIViewController, XMLParserDelegate {
+class FeedViewController: UIViewController, XMLParserDelegate, FeedTableViewCoordinatorDelegate {
     
     // MARK: - Properties
     
@@ -21,35 +21,49 @@ class FeedViewController: UIViewController, XMLParserDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        var items = [["1", "2", "3", "4", "5"], ["A", "B", "C", "D"], ["x", "y", "z"]]
-//        tableViewCoordinator.reloadData(items)
+
+        tableViewCoordinator.delegate = self
         parser.delegate = self
         dispayFeed()
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     // MARK: - Private methods
     
     private func dispayFeed() {
         // TODO: check Internet connection
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         parser.beginParsing()
 
     }
     
+    // MARK: - FeedTableViewCoordinatorDelegate
+    
+    func feedTableViewCoordinatorDidSelectItem(item: FeedItem) {
+        print("selected: \(item)")
+    }
+
+    func feedTableViewCoordinatorDidRefresh() {
+        dispayFeed()
+    }
     
     // MARK: - XMLParserDelegate
     
     func parsingDidSucceed(result: [FeedItemData]) {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+
         coreDataManager.storeFeedItemsFromData(result)
         let feedItems = coreDataManager.getCurrentFeedItems()
+        if feedItems.count == 0 {
+            let alertController = AlertsUtility.alertControllerOfType(AlertType.Other,
+                                                                      message: Constants.Messages.EmptyFeedMsg)
+            self.presentViewController(alertController, animated: true, completion: nil)
+        }
         tableViewCoordinator.reloadData(feedItems)
     }
     
     func parsingDidFail(error: NSError) {
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+
         let alertController = AlertsUtility.alertControllerOfType(AlertType.Error, message: error.localizedDescription)
         self.presentViewController(alertController, animated: true, completion: nil)
     }
@@ -65,5 +79,3 @@ class FeedViewController: UIViewController, XMLParserDelegate {
      */
     
 }
-
-
