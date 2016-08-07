@@ -7,7 +7,7 @@
 //
 
 import UIKit
-typealias tableData = (dataSource: [FeedItem], headerData: String)
+typealias SectionData = (dataSource: [FeedItem], headerData: String)
 
 protocol FeedTableViewCoordinatorDelegate {
     func feedTableViewCoordinatorDidSelectItem(item: FeedItem)
@@ -67,38 +67,51 @@ final class FeedTableViewCoordinator: NSObject {
         tableView.reloadData()
     }
     
-    private static func generateDataSourceFromData(data: [FeedItem]) -> [tableData]? {
+    /**
+     Make an array of section titles and row items, grouped by section
+     
+     - parameter data: Input array
+     
+     - returns: Full data source for table
+     */
+    private static func generateDataSourceFromData(data: [FeedItem]) -> [SectionData]? {
+        // Configure date formatter for use with table headers
         let dateFormattingUtility = DateFormattingUtility.sharedInstance
         dateFormattingUtility.configureForUsage(UsageCase.TableHeader)
-        var currentDate: NSDate?
-        var index = 0
-        var fullDataSource = [tableData]()
+        
+        // Data is sorted by date with fetch request, so during
+        // traversal we can compare the FeedItem's date only with the
+        // previous one and decide whether the item should be added to the previous
+        // section or to the new one. Algorithm allows to perform this
+        // with O(n) complexity
+        var previousDate: NSDate?
+        var previousIndex = 0
+        var fullDataSource = [SectionData]()
         
         for item in data {
-            
             let pubDateStr = dateFormattingUtility.stringFromDate(item.pubDate!)
-            if currentDate == nil {
-                currentDate = item.pubDate
+            
+            if previousDate == nil {
+                // Add first section with first item
+                previousDate = item.pubDate
+                fullDataSource.append(SectionData([item], pubDateStr))
+                continue
             }
             
             let dateIsEqualToCurrent = NSCalendar.currentCalendar().isDate(item.pubDate!,
-                                                                           equalToDate: currentDate!,
+                                                                           equalToDate: previousDate!,
                                                                            toUnitGranularity: .Day)
             if dateIsEqualToCurrent {
-                if fullDataSource.count == 0 {
-                    fullDataSource.append(tableData([item], pubDateStr))
-                } else {
-                    let tableDataItem = fullDataSource[index].dataSource
-                    fullDataSource[index] = tableData(tableDataItem + [item], pubDateStr)
-                }
+                // Add item to the previous section
+                let sectionDataItem = fullDataSource[previousIndex].dataSource
+                fullDataSource[previousIndex] = SectionData(sectionDataItem + [item], pubDateStr)
             } else {
-                fullDataSource.append(tableData([item], pubDateStr))
-                currentDate = item.pubDate
-                index += 1
+                // Add new section
+                fullDataSource.append(SectionData([item], pubDateStr))
+                previousDate = item.pubDate
+                previousIndex += 1
             }
         }
-        
-        
         return fullDataSource
     }
     
@@ -119,13 +132,13 @@ class TableViewDelegate: NSObject, UITableViewDelegate {
     
     // MARK: - Properties
     
-    var data = [tableData]()
+    var data = [SectionData]()
     var coordinator: FeedTableViewCoordinator?
     
     // MARK: - UITableViewDelegate
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-                tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
         coordinator?.handleItemSelected(data[indexPath.section].dataSource[indexPath.row])
     }
     
@@ -152,7 +165,7 @@ class TableViewDataSource: NSObject, UITableViewDataSource {
     
     // MARK: - Properties
     
-    var data = [tableData]()
+    var data = [SectionData]()
     var headersData: Array<String> = [String]()
     
     // MARK: - UITableViewDataSource

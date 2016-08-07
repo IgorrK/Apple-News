@@ -17,5 +17,6 @@ extension FeedItem {
     @NSManaged var title: String?
     @NSManaged var body: String?
     @NSManaged var pubDate: NSDate?
+    @NSManaged var encodedContent: String?
 
 }

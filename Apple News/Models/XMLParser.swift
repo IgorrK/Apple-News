@@ -18,10 +18,11 @@ protocol XMLParserDelegate {
 
 final class XMLParser: NSObject, NSXMLParserDelegate {
     struct keys {
-        static let itemKey = "item"
-        static let titleKey = "title"
-        static let descriptionKey = "description"
-        static let pubDateKey = "pubDate"
+        static let item = "item"
+        static let title = "title"
+        static let description = "description"
+        static let pubDate = "pubDate"
+        static let encodedContent = "content:encoded"
     }
     
     private let URLString = "https://developer.apple.com/news/rss/news.rss"
@@ -59,10 +60,11 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
     
     // MARK: - NSXMLParserDelegate
     
-    func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
+    func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName
+        qName: String?, attributes attributeDict: [String : String]) {
         currentElement = elementName
         switch elementName {
-        case keys.itemKey:
+        case keys.item:
             currentData = FeedItemData()
         default:
             break
@@ -70,23 +72,25 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
     }
     
     func parser(parser: NSXMLParser, foundCharacters string: String) {
-        if currentElement == keys.titleKey ||
-            currentElement == keys.descriptionKey ||
-            currentElement == keys.pubDateKey {
+        if currentElement == keys.title ||
+            currentElement == keys.description ||
+            currentElement == keys.pubDate ||
+            currentElement == keys.encodedContent {
             foundCharacters += string
         }
     }
     
     func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
         switch elementName {
-        case keys.titleKey, keys.descriptionKey, keys.pubDateKey:
+        case keys.title, keys.description, keys.pubDate, keys.encodedContent:
             if currentData != nil {
-                // remove newline symbol from each element
-                let result = foundCharacters.substringFromIndex(foundCharacters.startIndex.advancedBy(1))
+                // remove newline symbols from each element
+                let result = foundCharacters.stringByReplacingOccurrencesOfString("\n", withString: "")
+//                let result = foundCharacters.substringFromIndex(foundCharacters.startIndex.advancedBy(1))
                 currentData![elementName] = result
             }
-              foundCharacters = ""
-        case keys.itemKey:
+            foundCharacters = ""
+        case keys.item:
             guard let currentData = currentData else {
                 let error = NSError.init(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Internal parsing error."])
                 delegate?.parsingDidFail(error)
@@ -100,15 +104,17 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
     }
     
     func parserDidEndDocument(parser: NSXMLParser) {
+
+
         delegate?.parsingDidSucceed(parsedData)
     }
     
     func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError) {
-       delegate?.parsingDidFail(parseError)
+        delegate?.parsingDidFail(parseError)
     }
-
+    
     func parser(parser: NSXMLParser, validationErrorOccurred validationError: NSError) {
-       delegate?.parsingDidFail(validationError)
+        delegate?.parsingDidFail(validationError)
     }
     
 }

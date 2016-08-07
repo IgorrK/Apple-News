@@ -57,10 +57,11 @@ class FeedItem: NSManagedObject {
      */
     static func initNewObject(dictionary: FeedItemData, inContext: NSManagedObjectContext) -> NSManagedObject {
         let feedItem = NSEntityDescription.insertNewObjectForEntityForName(EntityName, inManagedObjectContext: inContext) as! FeedItem
-        feedItem.title = dictionary[XMLParser.keys.titleKey]
-        feedItem.body = dictionary[XMLParser.keys.descriptionKey]
+        feedItem.title = dictionary[XMLParser.keys.title]
+        feedItem.body = dictionary[XMLParser.keys.description]
+        feedItem.encodedContent = dictionary[XMLParser.keys.encodedContent]
         DateFormattingUtility.sharedInstance.configureForUsage(UsageCase.PubDate)
-        let dateStr = dictionary[XMLParser.keys.pubDateKey]!
+        let dateStr = dictionary[XMLParser.keys.pubDate]!
         feedItem.pubDate = DateFormattingUtility.sharedInstance.dateFromString(dateStr)
         return feedItem
     }
