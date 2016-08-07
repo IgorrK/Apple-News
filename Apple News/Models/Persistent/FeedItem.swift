@@ -9,13 +9,6 @@
 import Foundation
 import CoreData
 
-
-struct TemporaryFeedItem {
-    var title: String?
-    var body: String?
-    var pubDate: NSDate?
-}
-
 class FeedItem: NSManagedObject {
     
     // - Properties
@@ -41,8 +34,8 @@ class FeedItem: NSManagedObject {
 
      - returns: Created object
      */
-    static func insertNewObjectIntoContext(context: NSManagedObjectContext) -> NSManagedObject {
-        return NSEntityDescription.insertNewObjectForEntityForName(EntityName, inManagedObjectContext: context)
+    static func insertNewObjectIntoContext(context: NSManagedObjectContext) -> FeedItem? {
+        return NSEntityDescription.insertNewObjectForEntityForName(EntityName, inManagedObjectContext: context) as? FeedItem
     }
     
     /**
@@ -55,14 +48,29 @@ class FeedItem: NSManagedObject {
      
      - returns: Created object
      */
-    static func initNewObject(dictionary: FeedItemData, inContext: NSManagedObjectContext) -> NSManagedObject {
-        let feedItem = NSEntityDescription.insertNewObjectForEntityForName(EntityName, inManagedObjectContext: inContext) as! FeedItem
+    static func initNewObject(dictionary: FeedItemData, inContext: NSManagedObjectContext) -> NSManagedObject? {
+        // Create object
+        guard let feedItem = FeedItem.insertNewObjectIntoContext(inContext) else {
+            print("error creating object")
+            return nil
+        }
+        
+        // Title
         feedItem.title = dictionary[XMLParser.keys.title]
+        
+        // Plain and HTML-encoded body. Decided to store both because
+        // HTML-encoded text is required for displaying hyperlinks on Feed Details screen
+        // and plain text is used in Feed table, and transforming from HTML each
+        // time would overload the main thread, causing animation lags and 
+        // affecting preformance.
         feedItem.body = dictionary[XMLParser.keys.description]
         feedItem.encodedContent = dictionary[XMLParser.keys.encodedContent]
-        DateFormattingUtility.sharedInstance.configureForUsage(UsageCase.PubDate)
+        
+        // Date
         let dateStr = dictionary[XMLParser.keys.pubDate]!
+        DateFormattingUtility.sharedInstance.configureForUsage(UsageCase.PubDate)
         feedItem.pubDate = DateFormattingUtility.sharedInstance.dateFromString(dateStr)
+        
         return feedItem
     }
 }

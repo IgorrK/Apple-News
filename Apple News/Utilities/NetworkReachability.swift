@@ -8,7 +8,7 @@
 
 import SystemConfiguration
 
-class NetworkReachability: NSObject {
+final class NetworkReachability: NSObject {
     
     // MARK: Class methods
     

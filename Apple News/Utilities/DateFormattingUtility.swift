@@ -53,7 +53,6 @@ final class DateFormattingUtility: NSObject {
         }
     }
     
-    
     func dateFromString(string: String) -> NSDate? {
         return dateFormatter.dateFromString(string)
     }

@@ -12,11 +12,23 @@ import CoreData
 typealias FeedItemData = Dictionary<String, String>
 
 protocol XMLParserDelegate {
+    /**
+     Called when XML parser has finished parsing
+     
+     - parameter result: Array of items, represented in dictionaries
+     */
     func parsingDidSucceed(result: [FeedItemData])
+    
+    /**
+     Called when XML parser has encountered an error
+     
+     - parameter error: Error object
+     */
     func parsingDidFail(error: NSError)
 }
 
 final class XMLParser: NSObject, NSXMLParserDelegate {
+    
     struct keys {
         static let item = "item"
         static let title = "title"
@@ -25,9 +37,9 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
         static let encodedContent = "content:encoded"
     }
     
-    private let URLString = "https://developer.apple.com/news/rss/news.rss"
-    
     // MARK: - Properties
+
+    private let URLString = "https://developer.apple.com/news/rss/news.rss"
     
     var delegate: XMLParserDelegate?
     
@@ -86,7 +98,6 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
             if currentData != nil {
                 // remove newline symbols from each element
                 let result = foundCharacters.stringByReplacingOccurrencesOfString("\n", withString: "")
-//                let result = foundCharacters.substringFromIndex(foundCharacters.startIndex.advancedBy(1))
                 currentData![elementName] = result
             }
             foundCharacters = ""
@@ -104,8 +115,6 @@ final class XMLParser: NSObject, NSXMLParserDelegate {
     }
     
     func parserDidEndDocument(parser: NSXMLParser) {
-
-
         delegate?.parsingDidSucceed(parsedData)
     }
     

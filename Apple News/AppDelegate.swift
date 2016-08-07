@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        configureNavBarAppearance()
         return true
     }
 
@@ -44,6 +44,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.saveContext()
     }
 
+    
+    // MARK: - Helper methods
+    
+    private func configureNavBarAppearance() {
+        UINavigationBar.appearance().barTintColor = UIColor(red: 0.6247, green: 0.777, blue: 0.9157, alpha: 1.0)
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor()]
+        
+        // Changeing UINavigationBar's tint color affects status bar,
+        // so we need to reset status bar's bacground color
+        guard  let statusBar = UIApplication.sharedApplication().valueForKey("statusBarWindow")?.valueForKey("statusBar") as? UIView else {
+            return
+        }
+        statusBar.backgroundColor = UIColor.whiteColor()
+    }
+    
     // MARK: - Core Data stack
 
     lazy var applicationDocumentsDirectory: NSURL = {

@@ -58,7 +58,6 @@ final class CoreDataManager: NSObject {
             print("!!FETCH error: \(error)")
             return [FeedItem]()
         }
-        
     }
     
     // MARK: - Private methods

@@ -10,7 +10,16 @@ import UIKit
 typealias SectionData = (dataSource: [FeedItem], headerData: String)
 
 protocol FeedTableViewCoordinatorDelegate {
+    /**
+     Called when user has selected a table row
+     
+     - parameter item: Item in table row
+     */
     func feedTableViewCoordinatorDidSelectItem(item: FeedItem)
+    
+    /**
+     Called when user has pulled a refresh control
+     */
     func feedTableViewCoordinatorDidRefresh()
 }
 
@@ -128,7 +137,7 @@ private extension FeedTableViewCoordinator {
     }
 }
 
-class TableViewDelegate: NSObject, UITableViewDelegate {
+final class TableViewDelegate: NSObject, UITableViewDelegate {
     
     // MARK: - Properties
     
@@ -161,7 +170,7 @@ class TableViewDelegate: NSObject, UITableViewDelegate {
     }
 }
 
-class TableViewDataSource: NSObject, UITableViewDataSource {
+final class TableViewDataSource: NSObject, UITableViewDataSource {
     
     // MARK: - Properties
     
